@@ -40,72 +40,38 @@ This investigation seeks to address a gap in the current literature by providing
 
 The structure of the paper is organized as follows: Following @sec-intro, @sec-data presents the data, detailing the data sources, analytical techniques, and the rationale behind the chosen methods. @sec-model then covers the specifics of the linear model analysis, laying out the statistical underpinnings that support our investigation. After that, @sec-result discusses the results, elaborating on the observed trends and patterns in wage rate data. @sec-discussion interprets these findings in light of the current economic and educational context in Canada, exploring potential factors influencing these trends, drawing connections to broader socio-economic issues, and providing suggestions for future research in this area.
 
+
 # Data {#sec-data}
 
 This section aims to offer a understanding of the dataset utilized in our analysis, which serves as the foundation for our examination of the relationship between education and average hourly wage rates in Canada, specifically within the 25-54 age demographic.
 
-## Source and Methodology
+## Overview
 
 This study uses a dataset sourced from the Open Government Portal of Canada [@citedata], specifically designed to track the correlation between educational attainment and hourly wages across various demographic segments of the Canadian workforce. The dataset covers the period from the year 2000 onwards, providing a longitudinal view of wage trends in relation to educational background.
 
 Alternative datasets, such as those from Statistics Canada’s Labour Force Survey, were considered but were not selected due to their less detailed categorization of education levels and their broader focus on employment without specific wage breakdowns by education.
 
-The data was processed and cleaned using `R` [@citeR], a powerful statistical programming language. The selection of this dataset was motivated by its direct relevance to the research question and its regular updates, ensuring that the data remains relevant for observing current trends. Initial data processing involved filtering the dataset to focus solely on entries categorized under 'Canada' in geography, eliminating data irrelevant to the national focus of this research. This step was crucial to maintaining the clarity and relevance of the analysis. For key operations, please refer to [Appendix -@sec-data-cleaning]. 
+The data was processed and cleaned using `R` [@citeR], a powerful statistical programming language. The selection of this dataset was motivated by its direct relevance to the research question and its regular updates, ensuring that the data remains relevant for observing current trends. Initial data processing involved filtering the dataset to focus solely on entries categorized under 'Canada' in geography, eliminating data irrelevant to the national focus of this research. This step was crucial to maintaining the clarity and relevance of the analysis. For key operations, please refer to [Appendix -@sec-data-cleaning].
 
-## Variables
-
-To better understand the data, key variables extracted for this study include the year of data collection, education level, age group, and the average hourly wage rate. Notably, we have streamlined the 'Education level' from a broad range of categories into a numeric variable that aligns with ascending educational attainment, facilitating a quantitative analysis of its impact on wages. The age group has been limited to the 25-54 years range to focus on the most economically active segment of the population, avoiding potential outliers from younger individuals with less work experience and older individuals whose advanced education, such as doctoral degrees, could distort the analysis. Wage rates are presented in Canadian dollars per hour, reflecting pre-tax earnings, inclusive of tips, commissions, and bonuses.
-
-```{r}
-#| label: tbl-display-clean-data
-#| tbl-cap: First Ten Rows of Hourly Wage Across 2000-2019 After Data Processing
-#| echo: false
-
-cleaned_data <- read.csv(here::here("data/analysis_data/analysis_data.csv"))
-
-cleaned_data |>
-  select(Year, Education.level, Age.group, Avg.hourly.wage.rate) |>
-  slice(1:10) |>
-  kable(
-    col.names = c("Year", "Education Level", "Age", "Hourly Wage"),
-    digits = 1,
-    booktabs = TRUE
-  )
-```
-@tbl-display-clean-data, created with `kableExtra` [@citekableExtra], outlines the first ten records of our dataset, featuring average hourly wages for Canadians aged 25-54 across varying levels of education from the years 2000 to 2019. This snapshot reveals the variable structure of our analysis, which includes the `Year` of wage data, the defined `Education level` ranging from "0 - 8 years" to "Above bachelor’s degree," and the consistent `Age group` focus. It provides an early indication of the ascending trend in wages with higher educational attainment, setting the stage for our deeper investigation into the economic value of education within Canada's workforce.
-
-To transition from a tabular overview to a more graphical representation, we will visualize the data, which will allow us to spot patterns and trends that are not immediately apparent in numerical form.
-
-```{r fig.width=7, fig.height=3}
-#| label: fig-display-clean-data
-#| fig-cap: Average Hourly Wages by Educational Attainment, 2000-2019
-#| echo: false
-
-ggplot(cleaned_data, aes(x = Year, y = Avg.hourly.wage.rate, color = Education.level)) +
-  geom_point(alpha = 0.7, size = 2) + 
-  labs(
-    x = "Year",
-    y = "Average Hourly Wage Rate (CAD)",
-    color = "Education Level"
-  ) +
-  theme_minimal(base_size = 10) + 
-  theme(
-    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 8),
-    axis.text.y = element_text(size = 8),
-    legend.position = "right",
-    legend.text = element_text(size = 8)
-  ) +
-  scale_color_brewer(palette = "Set1")  # Keep the color palette for distinction
-```
-@fig-display-clean-data, built by `ggplot2` [@citeggplot], illustrates the distribution of average hourly wage rates across different educational levels from 2000 to 2019 for Canadian workers aged 25-54. Each dot represents the wage rate for a specific education level in a given year, with color coding to distinguish between educational categories, ranging from "0 – 8 years" to "University degree." The spread and upward trend of the points suggest that individuals with higher educational qualifications tend to have higher average hourly wages, and this trend persists over the 20-year period.
-
-## Measurements
+## Measurement
 
 The measurement of variables within this dataset was handled to ensure accuracy and relevance. The 'Average Hourly Wage Rate' is calculated based on actual wages reported by employers, providing an objective measure of income. This data is then vetted and standardized by the Government of Ontario to ensure it reflects accurate and fair representations of wages across different demographics.
 
 For educational attainment, data entry occurs as individuals enter the workforce or update their qualifications, with categorizations reflecting the highest level of formal education completed. This data is collected through surveys and employment records, often as part of broader demographic data collection efforts by governmental agencies.
 
 Correlations between the variables will be examined in @sec-model, providing insights into how education levels are associated with hourly wages. By understanding these relationships, we can better infer the potential impact of education on earnings within the Canadian economy.
+
+## Outcome variables
+
+### Hourly Wages
+
+## Predictor variables
+
+### Education
+
+### Gender
+
+### Age
 
 
 # Model {#sec-model}
@@ -116,9 +82,17 @@ In our analysis, we utilized a simple linear regression model, a technique well-
 
 Background details and diagnostics are included in [Appendix -@sec-model-details].
 
+## Alternative model
+
+
 ## Model set-up
 
-Define $y_i$ represent the average hourly wage rate for the $i^{th}$ individual. The predictor variable, $x_i$, corresponds to the numeric value assigned to each education level. The model can be described by the following equations:
+The model predicts hourly wages using the following predictor variables:
+
+- 
+
+The model takes the form:
+
 
 $$
 \begin{aligned}
@@ -130,100 +104,25 @@ y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
 \end{aligned}
 $$
 
-The model is executed in `R` [@citeR] using the `rstanarm` package [@citerstanarm]. Default priors from `rstanarm` [@citerstanarm] are used, set with a mean of zero and a conservative standard deviation.
+The model is executed in \texttt{R} [@citeR] using the \texttt{rstanarm} package [@rstanarm]. Default priors from \texttt{rstanarm} [@rstanarm] are used, with the priors set to have a mean of zero and a moderate standard deviation to ensure a reasonable level of regularization.
 
 ## Model justification
 
-Given the economic theory and previous findings, we anticipate that higher educational qualifications would correspond to higher hourly wages. This is encapsulated in the assumption that $\beta_i$ should have a positive effect on $y_i$. Through Bayesian analysis, we aim to capture the degree to which educational attainment can predict wage rates, thus providing evidence to support or refine this hypothesis.
-
-We selected a Gaussian linear regression model to examine the relationship between education level and average hourly wages because our dependent variable, the wage rate, is a continuous data point that typically follows a normal distribution. Linear regression is a straightforward method for assessing the impact of one or more independent variables on a dependent variable. In this case, it helps us understand how increasing education levels, which we have numerically encoded, relate to wage rates.
-
-Further justification for this model comes from its foundation in the central limit theorem, which suggests that with a large sample size, our wage rate data should be normally distributed. Moreover, the expected positive correlation between education and wages aligns with existing economic studies, reinforcing our theoretical framework. The simplicity of the model aids in avoiding overfitting, ensuring that the results are generalizable and relevant to a broader population. The regression model's assumptions—linearity, independence, and normality of residuals—are all conditions that our dataset reasonably meets, making a Gaussian linear regression not only a convenient choice but also statistically appropriate for our analysis.
 
 
 # Results {#sec-result}
 
-@sec-result explores the relationship between education and average hourly wages in Canada. Utilizing a dataset that captures 20 years of wage data across varying educational levels, we apply a linear modeling approach to uncover patterns and draw conclusions about the economic value of educational advancement. Below, we present the results of our model and its implications.
-
-```{r}
-#| label: tbl-summary-model
-#| tbl-cap: Summary of the Linear Regression Model
-#| echo: false
-#| warning: false
-
-linear_model <- readRDS(file = here::here("models/linear_model.rds"))
-
-modelsummary(
-  list(
-    "Linear Model" = linear_model
-  )
-)
-```
-
-The results obtained from our linear model, which predicts the average hourly wage rate based on the numeric representation of education levels, show a clear and positive relationship between educational attainment and wage rate. @tbl-summary-model indicates that the intercept is estimated at 16.143, suggesting that when the education level is at the baseline (0 - not accounted for in the numeric scale), the average hourly wage rate would be approximately 16.14. Importantly, the coefficient for Education_numeric is positive (1.672), supporting the hypothesis that higher educational levels correlate with higher wage rates. The model used 180 observations for the analysis, with an R-squared value of 0.610, which means that approximately 61% of the variance in the average hourly wage rate is explained by the model. The adjusted R-squared, which accounts for the number of predictors in the model, is very close to the R-squared, indicating a good fit without overfitting. Notably, the RMSE (Root Mean Square Error) of 3.43 reflects the standard deviation of the prediction errors, which measures how spread out these errors are around the true regression line.
-
-```{r fig.width=7, fig.height=4}
-#| label: fig-visualize-model
-#| fig-cap: Relationship between Hourly Wage Rate and Education Level
-#| echo: false
-#| warning: false
-
-analysis_data <- read.csv(file = here::here("data/analysis_data/analysis_data.csv"))
-
-plot1 <- analysis_data |>
-  ggplot(aes(x = Education_numeric, y = Avg.hourly.wage.rate, colour = as.factor(Year))) +
-  geom_point(alpha = 0.5) +
-  geom_smooth(
-    method = "lm",
-    se = TRUE,
-    color = "black",
-    linetype = "dashed",
-    formula = y ~ x
-  ) +
-  scale_colour_viridis_d() +  # Colorblind-friendly palette
-  labs(
-    x = "Education Level",  # Rename x-axis
-    y = "AVG Hourly Wage Rate",  # Rename y-axis
-    colour = "Year"  # Rename legend title
-  ) +
-  theme_classic() +
-  theme(
-    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
-    axis.title.x = element_text(size = 12),  # Adjust x-axis title size if needed
-    axis.title.y = element_text(size = 12),  # Adjust y-axis title size if needed
-    legend.position = "right",
-    legend.title = element_text(hjust = 0.5)
-  ) +
-  guides(colour = guide_legend(title = "Year", ncol = 2))
-# Display the plot
-print(plot1)
-```
-@fig-visualize-model illustrates the fitted linear regression line across the spread of average hourly wage rates for different education levels over the years 2000 to 2019. Each point in the scatter plot corresponds to the average hourly wage rate for a given education level, differentiated by color to represent each year. The dashed line across the plot signifies the best-fit linear regression line, which inclines upward as the education level increases. The diversity of colors along the regression line also reveals the variation in wage rates across different years, although the increasing trend is consistent throughout.
-
-In conclusion, the results presented align with the initial hypothesis, showing that as education level increases, there is a corresponding increase in the average hourly wage rate. This validates the underlying assumption that more advanced education tends to lead to better-paying job opportunities. The analysis effectively captures the essence of the data, allowing for a meaningful interpretation that leads us into the discussion. In the next @sec-discussion, we will discuss the implications of these findings, examining their relevance to current labor market theories and the potential for informing education and economic policy decisions.
-
 
 # Discussion {#sec-discussion}
 
-In this paper, we investigated the relationship between educational attainment and average hourly wage rates from 2000 to 2019. By deploying a linear Bayesian model, we have been able to highlight the correlation between higher educational attainment and increased wage rates, aligning with our original hypothesis.
 
 ## Findings
 
-Our analysis reveals a clear, positive correlation between education level and average hourly wage rates across the data spanning from 2000 to 2019. The consistent upward trend in wage rates with higher education levels across the years underscores the value of educational attainment in the labor market. Despite some fluctuations, the general pattern suggests that investments in education are likely to be economically beneficial for individuals in the age group of 25-54 years.
 
 ## Insights on Education and Wages
 
-The results of this study offer clear evidence that educational attainment is closely tied to wage earnings, highlighting the premium that the labor market places on higher qualifications. This finding is consistent with current labor market theories that emphasize the importance of human capital—suggesting that investments in education are indeed reflected in higher wages. Specifically, our data supports the view that a well-educated workforce is critical for economic growth and competitiveness in today's globalized world, which increasingly values knowledge and specialized skills.
-
-From a policy perspective, these insights could serve as a catalyst for reform, underscoring the need for investments in education. Policymakers might use this information to support sectors that are likely to offer greater economic returns for educational investments. This could involve bolstering STEM (Science, Technology, Engineering, and Mathematics) education, for example, or providing incentives for pursuing in-demand fields such as healthcare or information technology.
-
-In conclusion, this study's findings highlight the significance of education as a determinant of economic success and reinforce the importance of informed educational and economic policymaking. For policymakers, the imperative is clear: to design and implement educational strategies that not only increase access to education but also ensure that the education provided is relevant and responsive to the current and future needs of the labor market.
 
 ## Limitations and Future Research Directions
-
-The primary limitation of this study is its relatively small sample size, with only 180 observations. This constraint may impact the generalization of the findings. Additionally, the focus on the age group of 25-54 years might not encapsulate the full spectrum of the workforce, especially considering the varied career stages and life circumstances of younger and older workers. Such a limited scope might overlook the effects of education on wages across different life stages.
-
-Future research should aim to disaggregate the age groups to understand the differential impact of education on wages. Distinguishing between early-career individuals, mid-career professionals, and late-career individuals could yield more insights into the education-wage dynamic at different life stages. Additionally, expanding the sample size and including more varied age groups would enhance the representativeness and depth of the analysis.
 
 
 \newpage
@@ -231,6 +130,10 @@ Future research should aim to disaggregate the age groups to understand the diff
 \appendix
 
 # Appendix {-}
+
+# Census methodology overview and evaluation
+
+# Idealized methodology and survey
 
 # Data Manipulation and Cleaning {#sec-data-cleaning}
 
@@ -248,51 +151,7 @@ In all figures and tables, the library `here` [@citehere] was used to ensure tha
 
 ## Posterior predictive check
 
-In @fig-ppcheckandposteriorvsprior-1, we implement a posterior predictive check, which displays the overlap between the observed data (denoted by $y$) and the replicated data generated from the model (denoted by $y_{rep}$). The density of the replicated data largely coincides with the observed data, suggesting that our model does a reasonable job of capturing the underlying distribution of the observed average hourly wage rates. This alignment is crucial as it indicates that the model's predictions are consistent with the real-world data we aim to understand and that the model can be a reliable tool for further inference.
-
-In @fig-ppcheckandposteriorvsprior-2, we compare the posterior distributions of our parameters with the priors. This comparison reveals how the observed data have updated our beliefs about the parameters. We see that the posterior distributions for the intercept and the education_numeric coefficient are more concentrated and shifted from the priors, indicating that the data provided substantial information to update our initial assumptions. The sigma parameter's posterior, which represents the standard deviation of the residuals, is also refined from its prior, showing that the data have informed us about the variability in wages that is not explained by education level alone.
-
-```{r}
-#| eval: true
-#| echo: false
-#| message: false
-#| warning: false
-#| label: fig-ppcheckandposteriorvsprior
-#| layout-ncol: 2
-#| fig-cap: "Examining how the model fits, and is affected by, the data"
-#| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
-
-pp_check(linear_model) +
-  theme_classic() +
-  theme(legend.position = "bottom")
-
-posterior_vs_prior(linear_model) +
-  theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  coord_flip()
-```
-
 ## Diagnostics
-
-```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| warning: false
-#| label: fig-stanareyouokay
-#| fig-cap: "Checking the convergence of the MCMC algorithm"
-#| fig-subcap: ["Trace plot", "Rhat plot"]
-#| layout-ncol: 2
-
-plot(linear_model, "trace")
-
-plot(linear_model, "rhat")
-```
-
-In @fig-stanareyouokay-1, the trace plot demonstrates the sampling paths of the Markov chains for each parameter in the model. The trace for the intercept, education_numeric coefficient, and sigma parameter all display a ‘hairy caterpillar’ shape, indicating good mixing and convergence across multiple chains. This suggests that the model's parameter estimates are stable and reliable, as evidenced by the overlapping and intertwined paths, which is indicative of a well-fitting model.
-
-@fig-stanareyouokay-2, the Rhat plot, presents the R-hat statistics for each parameter, which is a measure of convergence. We see that all values at or very close to 1.00. This is a desirable outcome, implying that further sampling would likely yield little additional information and that the posterior estimates can be considered reliable for inference.
 
 
 \newpage
