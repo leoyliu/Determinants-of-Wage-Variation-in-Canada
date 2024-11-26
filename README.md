@@ -8,16 +8,17 @@ The repository contains a study that investigates the impact of education levels
 
 The repo is structured as:
 
--   `data/raw_data` contains the raw data as obtained from the Government of Ontario.
--   `data/analysis_data` contains the cleaned dataset that was constructed.
--   `model` contains fitted models.
--   `other` contains a datasheet, details about LLM chat interactions, and sketches.
+-   `data/00-simulated_data` contains the simulated dataset.
+-   `data/01-raw_data` contains the raw data as obtained from [Government of Canada](https://open.canada.ca/data/en/dataset/1f14addd-e4fc-4a07-9982-ad98db07ef86/resource/ed8b30ed-cde4-4559-8fcb-20605182d3ff).
+-   `data/02-analysis_data` contains the cleaned dataset that was constructed.
+-   `model` contains fitted models. 
+-   `other` contains details about LLM chat interactions, and sketches.
 -   `paper` contains the files used to generate the paper, including the Quarto document and reference bibliography file, as well as the PDF of the paper.
--   `scripts` contains the R scripts used to simulate, clean, test, and model data.
+-   `scripts` contains the R scripts used to download, simulate, clean, model, and test data.
 
 ## Statement on LLM usage
 
-The ChatGPT-4 model contributed to the creation of data validation tests and the polishing of wording. The entire chat history is available in `other/llm/usage.txt`.
+The ChatGPT-4 model assisted with data validation, test creation, data cleaning, simulation generation, plot generation, and the polishing of wording. The entire chat history is available in `other/llm_usage/usage.txt`.
 
 ------------------------------------------------------------------------
 
