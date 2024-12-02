@@ -1,5 +1,5 @@
 #### Preamble ####
-# Purpose: Tests the structure and validity of the simulated "placeholder" dataset.
+# Purpose: Tests the structure and validity of the simulated dataset.
 # Author: Yuanyi (Leo) Liu
 # Date: 26 November 2024
 # Contact: leoy.liu@mail.utoronto.ca
@@ -7,7 +7,7 @@
 # Pre-requisites: 
 #   - The `tidyverse`, `testthat` packages must be installed and loaded
 #   - 00-simulate_data.R must have been run
-# Any other information needed? Make sure you are in the `Forecasting-the-2024-US-Presidential-Election` rproj
+# Any other information needed? Make sure you are in the `Determinants-of-Wage-Variation-in-Canada` rproj
 
 
 #### Workspace setup ####
@@ -23,28 +23,23 @@ test_that("dataset was successfully loaded", {
 
 
 #### Test data ####
-
-# Check if the dataset has 1000 rows
-test_that("dataset has 1000 rows", {
-  expect_equal(nrow(simulated_data), 1000)
+# Check if the dataset has 1080 rows
+test_that("dataset has 1080 rows", {
+  expect_equal(nrow(simulated_data), 1080)
 })
 
-# Check if the dataset has 11 columns
-test_that("dataset has 11 columns", {
-  expect_equal(ncol(simulated_data), 11)
+# Check if the dataset has 5 columns
+test_that("dataset has 5 columns", {
+  expect_equal(ncol(simulated_data), 5)
 })
 
-# Check if the 'state' column contains only valid US state names
-valid_states <- c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware",
-                           "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky",
-                           "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", 
-                           "Missouri", "Montana", "Nebraska", "Nevada","New Hampshire", "New Jersey", "New Mexico", "New York",
-                           "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", 
-                           "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", 
-                           "West Virginia", "Wisconsin", "Wyoming", "District of Columbia", "National")
-
-test_that("'state' column contains only valid US state names", {
-  expect_true(all(simulated_data$state %in% valid_states))
+# Check if the 'Education_level' column contains valid education levels
+valid_education_levels <- c("0 - 8 years", "High school graduate", 
+                      "Post-secondary certificate or diploma", "Trade certificate or diploma", 
+                      "Community college, CEGEP", "University certificate below bachelors degree", 
+                      "University degree", "Bachelor's degree", "Above bachelor's degree")
+test_that("'Education_level' column contains valid education levels", {
+  expect_true(all(simulated_data$Education_level %in% valid_education_levels))
 })
 
 # Check if there are any missing values in the dataset
@@ -52,43 +47,33 @@ test_that("dataset contains no missing values", {
   expect_true(all(!is.na(simulated_data)))
 })
 
-# Check if there are no empty strings in 'methodology', 'state', and 'pollster_name' columns
-test_that("no empty strings in 'methodology', 'state', and 'pollster_name'", {
-  expect_true(all(simulated_data$methodology != "" & simulated_data$state != "" & simulated_data$pollster_name != ""))
+# Check if there are no empty strings in 'Education_level', 'Age_group', and 'Gender' columns
+test_that("no empty strings in 'Education_level', 'Age_group', and 'Gender'", {
+  expect_true(all(simulated_data$Education_level != "" & simulated_data$Age_group != "" & simulated_data$Gender != ""))
 })
 
-# Check if the 'methodology' column has at least four unique values
-test_that("'methodology' column contains at least four unique values", {
-  expect_gte(n_distinct(simulated_data$methodology), 4)
+# Check if the 'Age_group' column has 3 unique values
+test_that("'Age_group' column contains 3 unique values", {
+  expect_gte(n_distinct(simulated_data$Age_group), 3)
 })
 
-# Check if 'numeric_grade' falls within a realistic range (e.g., 2.5 to 5.0)
-test_that("'numeric_grade' values are within the range 2.5 to 5.0", {
-  expect_true(all(simulated_data$numeric_grade >= 2.5 & simulated_data$numeric_grade <= 5.0))
+# Check if 'Gender' contains only "Male" and "Female"
+valid_genders <- c("Male", "Female")
+test_that("'Gender' column contains only 'Male' and 'Female'", {
+  expect_true(all(simulated_data$Gender %in% valid_genders))
 })
 
-# Check if 'transparency_score' is within a valid range (e.g., 4 to 10)
-test_that("'transparency_score' values are within the range 4 to 10", {
-  expect_true(all(simulated_data$transparency_score >= 4 & simulated_data$transparency_score <= 10))
+# Check if 'Year' falls within a realistic range (e.g., 2000 to 2019)
+test_that("'Year' values are within the range 2000 to 2019", {
+  expect_true(all(simulated_data$Year >= 2000 & simulated_data$Year <= 2019))
 })
 
-# Check if 'sample_size' is a positive integer and within a reasonable range (e.g., 300 to 3500)
-test_that("'sample_size' values are within the range 300 to 3500", {
-  expect_true(all(simulated_data$sample_size >= 300 & simulated_data$sample_size <= 3500))
-  expect_true(all(simulated_data$sample_size == floor(simulated_data$sample_size)))
+# Check if 'Avg_hourly_wage_rate' is non-negative and reasonable (e.g., no more than 200 dollars)
+test_that("'Avg_hourly_wage_rate' is non-negative and not exceeding 200 dollars", {
+  expect_true(all(simulated_data$Avg_hourly_wage_rate >= 0 & simulated_data$Avg_hourly_wage_rate <= 200))
 })
 
-# Check if 'end_date' is after a specific date (e.g., "2024-07-15")
-test_that("'end_date' is after 2024-07-15", {
-  expect_true(all(as.Date(simulated_data$end_date) >= as.Date("2024-07-15")))
-})
-
-# Check if 'pct' is between 0 and 100, representing a percentage
-test_that("'pct' values are between 0 and 100", {
-  expect_true(all(simulated_data$pct >= 0 & simulated_data$pct <= 100))
-})
-
-# Check if 'duration' (days until election) is non-negative and reasonable (e.g., not more than 200 days)
-test_that("'duration' is non-negative and not exceeding 200 days", {
-  expect_true(all(simulated_data$duration >= 0 & simulated_data$duration <= 200))
+# Check if there is at least one unique combination of 'Year', 'Education_level', 'Age_group', and 'Gender'
+test_that("Dataset contains unique combinations of 'Year', 'Education_level', 'Age_group', and 'Gender'", {
+  expect_equal(nrow(simulated_data), n_distinct(simulated_data$Year, simulated_data$Education_level, simulated_data$Age_group, simulated_data$Gender))
 })

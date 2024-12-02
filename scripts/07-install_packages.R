@@ -1,11 +1,11 @@
 #### Preamble ####
-# Purpose: Install necessary packages
+# Purpose: Install necessary packages.
 # Author: Yuanyi (Leo) Liu
-# Date: 31 March 2024
+# Date: 26 November 2024
 # Contact: leoy.liu@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: -
-# Any other information needed? -
+# Pre-requisites: None
+# Any other information needed? Make sure you are in the `Determinants-of-Wage-Variation-in-Canada` rproj
 
 
 #### Install packages ####
