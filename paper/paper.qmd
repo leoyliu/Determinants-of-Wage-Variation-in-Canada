@@ -205,53 +205,70 @@ cleaned_data %>%
 
 @fig-age illustrates the distribution of average hourly wages in Canada from 2000 to 2019 across three age groups: "15-24 years," "25-54 years," and "55 years and over." The youngest group, "15-24 years," exhibits the lowest wages, with a narrow distribution concentrated at the lower end. In contrast, the "25-54 years" and "55 years and over" groups show higher wages and broader distributions, reflecting greater variability in earnings as individuals gain experience and qualifications. The older age group generally earns the highest wages, highlighting the strong association between age, experience, and earning potential.
 
+
 # Model {#sec-model}
 
-The objective of our modeling approach is to quantify the relationship between educational attainment and hourly wages. Our analysis employs a Bayesian framework to assess how changes in the level of education correlate with variations in wage rates among Canadian workers aged 25-54.
+Our modeling approach seeks to quantify the relationship between demographic and educational factors and average hourly wages in Canada. To achieve this, we employ a linear regression model to examine how predictors such as education level, gender, and age group influence hourly earnings. The model is implemented using the `stan_lm` function, with a Gaussian distribution to capture the variability in hourly wages.
 
-In our analysis, we utilized a simple linear regression model, a technique well-suited for examining the relationship between a continuous dependent variable and one or more independent variables. Given that our dependent variable, `average hourly wage rate`, is continuous, a normal or Gaussian linear regression model is appropriate. This model assumes that the distribution of the wage rate, given the level of education, follows a normal distribution. This assumption allows for a straightforward interpretation of the parameters and is commonly used in practice. The use of a normal distribution for the error term is a standard choice, as it facilitates the estimation of the model parameters using maximum likelihood estimation. The simplicity and interpretability of this model, coupled with its appropriateness for the data at hand, make it a good fit for our study's objectives.
+In this analysis, we focus on predictors that capture key socio-economic and demographic characteristics. Specifically, we include `Education_level`, a categorical variable representing individuals' highest level of education; `Gender`, indicating whether the individual identifies as male or female; and `Age_group`, categorized into "15-24 years," "25-54 years," and "55 years and over." These predictors allow us to explore how differences in education, gender, and age intersect to shape wage outcomes.
 
-Background details and diagnostics are included in [Appendix -@sec-model-details].
+The model assumes that the average hourly wage, given these predictors, follows a normal distribution. This Gaussian assumption simplifies parameter estimation and aligns with standard practices in wage modeling. Additionally, we assume moderate priors to avoid overfitting while ensuring interpretability of the coefficients. This balanced approach enables us to identify meaningful relationships between the predictors and wages. Background details and diagnostics are included in [Appendix -@sec-model-details].
 
 ## Alternative model
 
+Initially, the `Education_level` variable was grouped into broader categories, such as "Low," "Medium," and "High" education levels, to simplify the analysis. This approach aimed to reduce the model’s complexity while capturing general trends in wage variation. However, this categorization diminished the model’s ability to detect differences in wages associated with specific education levels. For instance, combining "Bachelor’s degree" and "Above bachelor’s degree" into a single category masked the wage attributed to higher education, resulting in a less precise analysis.
+
+An alternative approach was also explored by excluding the `Age_group` variable, based on the hypothesis that its effects might overlap with those of education and gender. However, this exclusion led to a poorer model fit, as it failed to account for wage differences across age groups. Retaining `Age_group` as a distinct predictor improved the model’s performance, offering a more accurate depiction of how wages vary across life stages.
 
 ## Model set-up
 
-The model predicts hourly wages using the following predictor variables:
+The model predicts the average hourly wage using the following predictor variables:
 
-- 
+- Education Level (`Education_level`): A categorical variable representing the highest level of formal education attained by an individual. Levels range from "0–8 years" to "Above bachelor's degree."
+
+- Gender (`Gender`): A binary variable indicating whether an individual identifies as "Male" or "Female."
+
+- Age Group (`Age_group`): A categorical variable representing the age ranges of individuals, categorized as "15–24 years", "25–54 years", and "55 years and over".
 
 The model takes the form:
 
+\begin{align*}
+    y_i \mid \mu_i, \sigma &\sim \text{Normal}(\mu_i, \sigma) \\
+    \mu_i &= \beta_0 + \beta_1 \cdot \text{Education level}_i + \beta_2 \cdot \text{Gender}_i \\
+          &\quad + \beta_3 \cdot \text{Age group}_i + \epsilon_i \\
+    \epsilon_i &\sim \text{Normal}(0, \sigma^2)
+\end{align*}
 
-$$
-\begin{aligned}
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \beta_0 +\beta_1x_i\\
-\beta_0 &\sim \mbox{Normal}(0, 2.5) \\
-\beta_1 &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1) \\
-\end{aligned}
-$$
+\textbf{Where:}
+\begin{itemize}
+    \item $\beta_0$ is the intercept term.
+    \item $\beta_1, \beta_2, \beta_3$ are the coefficients for each predictor.
+    \item $\sigma^2$ is the variance of the error term.
+\end{itemize}
 
 The model is executed in \texttt{R} [@citeR] using the \texttt{rstanarm} package [@rstanarm]. Default priors from \texttt{rstanarm} [@rstanarm] are used, with the priors set to have a mean of zero and a moderate standard deviation to ensure a reasonable level of regularization.
 
 ## Model justification
 
+Existing economic theories and labor market research suggest that education level, age group, and gender notably influence wage outcomes. Higher levels of education are associated with greater specialization and skills, which typically result in higher earnings. Age reflects work experience and career progression, with older individuals often earning more due to accumulated skills and seniority. Gender remains a key determinant, as wage disparities between males and females persist across various labor markets. These predictors collectively capture essential socio-economic dimensions that shape wage structures in Canada.
+
+A Bayesian linear regression model was selected because the dependent variable (average hourly wage) is continuous and approximately normally distributed. This model is well-suited for assessing the contribution of each predictor to wage outcomes while controlling for the effects of others. For instance, the coefficients of education level, age group, and gender directly indicate their respective impacts on average wages.
+
+Further justification for using this model comes from its alignment with the central limit theorem, as the data aggregates wage observations across individuals. Additionally, the predictors align with established labor market theories, giving a solid theoretical underpinning to our model. The inclusion of priors in the Bayesian framework prevents overfitting, balancing interpretability and predictive accuracy.
+
+A key limitation of this model is that it is entirely trained on the analysis dataset, without splitting into training and testing subsets. Each observation in the dataset represents a unique combination of education level, age group, and gender, making it impossible to partition the data without losing critical combinations. While this approach ensures that all available data contribute to parameter estimation, it restricts the ability to validate predictions on unseen data. To compensate, internal validation methods, such as posterior predictive checks, are employed to evaluate the model’s fit and generalizability. Further discussion on this issue is provided in @sec-discussion.
 
 
 # Results {#sec-result}
 
-
-# Discussion {#sec-discussion}
-
+## Model Interpretation
 
 ## Findings
 
 
-## Insights on Education and Wages
+# Discussion {#sec-discussion}
 
+## Findings
 
 ## Limitations and Future Research Directions
 
@@ -261,8 +278,6 @@ The model is executed in \texttt{R} [@citeR] using the \texttt{rstanarm} package
 \appendix
 
 # Appendix {-}
-
-# Census methodology overview and evaluation
 
 # Idealized methodology and survey
 
