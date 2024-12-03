@@ -6,7 +6,7 @@
 # License: MIT
 # Pre-requisites: 
 #   - The `tidyverse`, `rstanarm`, `arrow` packages must be installed and loaded
-#   - 03-clean_data.R must have been run
+#   - 02-clean_data.R must have been run
 # Any other information needed? Make sure you are in the `Determinants-of-Wage-Variation-in-Canada` rproj
 
 

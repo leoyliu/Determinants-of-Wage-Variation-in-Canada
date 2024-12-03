@@ -27,6 +27,7 @@ library(modelsummary)
 library(rstanarm)
 ```
 
+\newpage
 
 # Introduction {#sec-intro}
 
@@ -84,7 +85,8 @@ hourly_wage_summary %>%
     col.names = c("Minimum Wage", "Maximum Wage", "Mean Wage", "Median Wage", "Standard Deviation"),
     digits = 2,
     booktabs = TRUE
-  )
+  ) %>%
+  kable_styling(font_size = 10, full_width = FALSE)
 ```
 
 @tbl-display-clean-data provides an overview of the distribution of average hourly wages in Canada from 2000 to 2019. The wages range from a minimum of \$7.60 to a maximum of \$43.39, with a mean of \$21.48 and a median of \$20.48, indicating that most wages are concentrated around the middle of the distribution, while a smaller proportion of higher earners pushes the maximum upward. The standard deviation of $7.40 reflects notable variability, emphasizing differences in earning potential influenced by factors such as education, gender, and age.
@@ -115,7 +117,7 @@ cleaned_data %>%
   theme_minimal()
 ```
 
-@fig-avg-wage illustrates the trend of average hourly wages in Canada from 2000 to 2019. Each dot represents the average wage for a specific year, and the overall shows a upward trend. The consistent increase in wages suggests improvements in earnings across the labor market, potentially driven by inflation, economic growth, and changes in workforce composition.
+Using package `ggplot2` [@citeggplot], @fig-avg-wage presents the trend of average hourly wages in Canada from 2000 to 2019. Each dot represents the average wage for a specific year, and the overall shows a upward trend. The consistent increase in wages suggests improvements in earnings across the labor market, potentially driven by inflation, economic growth, and changes in workforce composition.
 
 ## Predictor variables
 
@@ -256,21 +258,128 @@ A Bayesian linear regression model was selected because the dependent variable (
 
 Further justification for using this model comes from its alignment with the central limit theorem, as the data aggregates wage observations across individuals. Additionally, the predictors align with established labor market theories, giving a solid theoretical underpinning to our model. The inclusion of priors in the Bayesian framework prevents overfitting, balancing interpretability and predictive accuracy.
 
-A key limitation of this model is that it is entirely trained on the analysis dataset, without splitting into training and testing subsets. Each observation in the dataset represents a unique combination of education level, age group, and gender, making it impossible to partition the data without losing critical combinations. While this approach ensures that all available data contribute to parameter estimation, it restricts the ability to validate predictions on unseen data. To compensate, internal validation methods, such as posterior predictive checks, are employed to evaluate the model’s fit and generalizability. Further discussion on this issue is provided in @sec-discussion.
+A key limitation of this model is that it is entirely trained on the analysis dataset, without splitting into training and testing subsets. Each observation in the dataset represents a unique combination of education level, age group, and gender, making it impossible to partition the data without losing combinations. While this approach ensures that all available data contribute to parameter estimation, it restricts the ability to validate predictions on unseen data. To compensate, internal validation methods, such as posterior predictive checks, are employed to evaluate the model’s fit and generalizability. Further discussion on this issue is provided in @sec-discussion.
 
 
 # Results {#sec-result}
 
-## Model Interpretation
+@sec-result examines the relationship between education level, gender, and age group with respect to average hourly wages in Canada. Using the analysis dataset, we apply a Bayesian linear regression model to identify the key factors that influence hourly wages. Below, we present the results of our model, visualizations, and key takeaways.
 
-## Findings
+## Model results and interpretation
+
+The linear regression model built on the analysis dataset estimated the effects of education level, age group, and gender on average hourly wages. The results are summarized in @tbl-summary, with a focus on the coefficients and their implications. The intercept, estimated at 5.758, represents the baseline hourly wage for females aged 15-24 years with an education level of "0–8 years."
+
+```{r}
+#| label: tbl-summary
+#| tbl-cap: "Summary of regression model coefficients examining the relationship between education level, age group, gender, and average hourly wages in Canada."
+#| echo: false
+#| warning: false
+
+# Load the model
+model <- readRDS(file = here::here("models/linear_model.rds"))
+
+modelsummary(
+  list(
+    "coefficient" = model
+  )
+)
+```
+
+
+### Education Level
+
+Education level has a strong positive impact on hourly wages. Individuals with "Above bachelor’s degree" earn approximately 13.844 CAD more per hour compared to those with "0–8 years" of education. Similarly, holding a bachelor’s degree is associated with an increase of 10.726 CAD per hour, and having a university degree contributes an additional 11.740 CAD.
+
+### Age Group
+
+Hourly wages vary considerably across age groups. Individuals aged 25–54 years earn 9.630 CAD more per hour than those in the baseline group (15–24 years). Those in the 55+ age group experience an even higher increase of 10.546 CAD, reflecting the wage advantages linked to experience and seniority.
+
+### Gender
+
+The analysis highlights gender disparities in wages, with males earning 3.618 CAD more per hour than females on average. This finding reflects ongoing gender wage gaps, even after accounting for education and age group.
+
+Overall, the model explains a substantial portion of the variance in hourly wages, with an $R^2$ of 0.781, indicating that 78.1% of the variation is captured by the predictors. The adjusted $R^2$ of 0.778 supports the accuracy of the model, while the RMSE value of 3.45 suggests a reasonable level of error in predicting wages. These results align with economic theories that emphasize education as a key driver of earning potential, age as a proxy for experience, and persistent gender wage gaps in labor markets. A complete overview of the model and diagnostic details is available in [Appendix -@sec-model-details].
+
+## Visualization of Results
+
+The relationship between education level, gender, and age group with average hourly wages is illustrated in @fig-visualize-model. Each panel represents a distinct age group: "15–24 years," "25–54 years," and "55 years and over." Within each panel, points are color-coded by gender.
+
+```{r fig.width=10, fig.height=7}
+#| label: fig-visualize-model
+#| fig-cap: "Average hourly wages by education level, gender, and age group in Canada. Panels represent age groups, with points color-coded by gender. Dashed lines show linear trends, highlighting wage differences across education levels, genders, and age groups."
+#| echo: false
+#| warning: false
+
+cleaned_data |> 
+   ggplot(aes(x = reorder(Education_level, Average_hourly_wages, FUN = median), 
+             y = Average_hourly_wages, 
+             colour = Gender)) + 
+  geom_point(alpha = 0.5) + 
+  geom_smooth(
+    aes(group = Gender),
+    method = "lm",
+    se = TRUE,
+    color = "black",
+    linetype = "dashed",
+    formula = y ~ x
+  ) + 
+  scale_colour_manual(
+    values = c("Female" = "#FF6F61", "Male" = "#6495ED")
+  ) +
+  labs(
+    x = "Education Level",
+    y = "Average Hourly Wage",
+    colour = "Gender"
+  ) + 
+  facet_wrap(~Age_group, ncol = 3) +
+  theme_classic() + 
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 9),
+    axis.text.y = element_text(size = 9),
+    axis.title.x = element_text(size = 12),
+    axis.title.y = element_text(size = 12),
+    legend.position = "right",
+    legend.title = element_text(hjust = 0.5)
+  ) + 
+  guides(colour = guide_legend(title = "Gender", ncol = 1))
+```
+
+@fig-visualize-model presents that wages consistently increase with higher levels of education across all age groups. This trend is evident in the steepness of the linear trendlines, showing that the wage benefits associated with university degrees and qualifications above a bachelor’s degree. The gender wage gap is visible in all panels, with males earning higher wages than females at nearly every education level. Notably, the gap widens at higher education levels, suggesting that gender disparities are more significant as qualifications increase.
+
+It also highlights differences in wages across age groups. Older individuals, particularly those aged 55 and over, earn higher wages compared to younger cohorts, reflecting the influence of experience and career progression. Additionally, the intersection of gender, age, and education reveals further disparities. For example, males with higher education levels in older age groups consistently exhibit the highest wages, while younger females with lower education levels earn the least.
 
 
 # Discussion {#sec-discussion}
 
-## Findings
+## Key Findings
+
+### The Impact of Education on Wages
+
+Higher levels of education are strongly associated with increased hourly wages. Individuals with a bachelor’s degree or higher earn more than those with lower educational attainment. This trend reflects the demands of a knowledge-based economy, where employers value specialized qualifications and technical expertise. It underscores the role of education in enhancing skills and productivity, which directly translates to higher earnings.
+
+Moreover, the wage premium for higher education shows the importance of equitable access to education. Rising costs of tuition and other barriers could exacerbate socioeconomic inequalities, as those unable to access higher education may remain confined to lower-paying jobs. Policymakers should consider expanding access to affordable education to ensure broader participation in higher-paying sectors.
+
+### Age and Experience in Wage Growth
+
+The results reveal a clear wage advantage for middle-aged and older workers compared to younger individuals. Workers aged 25–54 years and 55+ years earn substantially more than their counterparts aged 15–24 years. This trend is likely attributable to experience, seniority, and the accumulation of skills over time, which enhance an individual’s productivity and value in the labor market.
+
+In practical terms, this trend reflects a lifecycle wage profile, where earnings typically peak during mid-career and stabilize or slightly decline as workers approach retirement. This understanding is important for retirement planning and addressing income inequality across life stages. Employers could also consider strategies to support younger workers, such as offering training programs and mentorship opportunities, to accelerate their skill development and income growth.
+
+### Persistent Gender Wage Disparities
+
+The analysis reveals a consistent wage disparity between males and females, with males earning much more across all education levels and age groups. This persistent wage gap suggests systemic inequities in how labor markets reward work. Factors contributing to this disparity may include occupational segregation, differences in work hours, career interruptions, and implicit biases in hiring and promotion processes.
+
+Addressing this gap requires targeted interventions. Initiatives such as wage transparency, mentorship programs for women, and policies promoting work-life balance could help bridge the divide. Beyond fairness, closing the gender wage gap has broader economic implications, as it could boost household incomes and enhance overall productivity in the economy.
 
 ## Limitations and Future Research Directions
+
+This study relies on a dataset that represents unique combinations of education level, age group, and gender, limiting the use of traditional validation methods like splitting data into training and testing sets. Future research could explore alternative approaches, such as bootstrapping or cross-validation, to enhance model.
+
+Additionally, the dataset focuses on a specific subset of the population and does not account for variables such as geographic location, race, or immigration status. These factors likely intersect with education, age, and gender to influence wages, and their inclusion could provide a more detailed understanding of wage disparities.
+
+The findings emphasize the economic returns of education, highlighting the need for investment in accessible, high-quality educational systems. The relationship between age and wages underscores the importance of workforce development and retirement planning. Additionally, addressing gender wage disparities requires systemic changes to ensure equitable rewards for labor.
+
+Future studies could investigate the causal mechanisms behind these trends using longitudinal data or natural experiments. Evaluating the effectiveness of policies, such as wage transparency laws or educational subsidies, could provide actionable understanding. Further research into the intersection of race, immigration status, and other factors with wages would deepen our analysis of labor market dynamics.
 
 
 \newpage
@@ -281,24 +390,191 @@ A key limitation of this model is that it is entirely trained on the analysis da
 
 # Idealized methodology and survey
 
+## Overview
+
+This survey is designed to investigate how demographic and educational factors influence average hourly wages in Canada. With a hypothetical budget of $50,000, the survey methodology aims to capture detailed and representative data from working-age individuals across diverse demographics. The survey focuses on three key variables: education level, age group, and gender, and it seeks to ensure accuracy, minimize bias, and provide coverage of the Canadian workforce.
+
+## Sampling approach
+
+The survey employs a stratified random sampling strategy to ensure that the collected data represents the Canadian working population. This approach helps capture wage patterns across various demographic groups.
+
+### Stratification variables 
+
+* Age Group: 15–24 years, 25–54 years, 55 years and over
+* Gender: Male, Female, and Non-binary
+* Education Level: 0 – 8 years, High school graduate, Trade certificate or diploma, Post-secondary certificate or diploma, Community college, University certificate below bachelor's degree, University degree, Bachelor's degree, Above bachelor's degree
+* Employment Type: Full-time workers, Part-time workers
+* Race: White, Black, Indigenous, Asian, Hispanic/Latino, Other
+* Hourly Income:  <\$15,  \$15-\$29, \$30-\$44, \$45-\$59, >\$60
+
+### Sample Size
+
+The survey targets 20,000 respondents across Canada. This sample size ensures a balance between budget constraints and statistical reliability, with an expected margin of error of ±2.5% at a 95% confidence level.
+
+## Recruitment Strategy
+
+To ensure a diverse and representative sample, the survey incorporates two recruitment strategies:
+
+**Online survey panels:**
+
+* Partner with reputable online survey platforms, such as SurveyMonkey or YouGov, which have access to extensive databases of respondents.
+* Validate participant demographics to match the stratification variables.
+
+**Social media advertising:**
+
+* Use platforms such as Facebook, LinkedIn, and Instagram to reach underrepresented groups, including younger individuals, minority groups, and non-binary respondents.
+* Tailor advertisements to target specific demographics and encourage participation.
+
+**Incentives:** Participants will be entered into a raffle for gift card prizes, ensuring high participation rates.
+
+## Data validation and quality control
+
+To maintain the integrity of the data, we will take the following measures:
+
+* **Attention checks:** At least two 'attention check' questions will be included in the survey to identify inattention or robots.
+* **Duplicate detection:** Use email or IP-based verification to prevent duplicate responses. Ensure that each respondent provides only one response set to keep the dataset unique.
+* **Response time monitoring:** Track the time it takes respondents to complete surveys. Responses with apparently faster-than-average completion times are labelled as potentially low-quality.
+* **Data consistency check:** Analyses the consistency of responses, especially between related questions. Inconsistent answers will be labelled for review.
+* **Panel partner validation:** For respondents recruited through an online survey panel, rely on the panel provider's in-built validation systems. These systems use various quality checks, such as identity verification and response consistency, which ensure high-quality data from panel participants.
+
+## Budget allocation
+
+* Online Panel Recruitment: $25,000
+* Social Media Advertising: $15,000
+* Participant Incentives: $5,000
+* Data Cleaning and Validation: $5,000
+
+## Survey implementation
+The survey will be available via Google Forms to ensure broad accessibility and easy data collection. The link to the survey will be distributed via email invitations to panellists and targeted social media adverts. To ensure maximum reach and diversity, multiple channels will be used, including Facebook, Instagram, and other social media platforms. The link to the survey is [here](https://forms.gle/UkkD4Xt6FaJeusu47).
+
+**Distribution plan:**
+
+* **Panel invitations:** Members of established survey panels (e.g. Lucid, YouGov) will receive email invitations to participate in the survey.
+* **Social media activities:** Targeted adverts will be placed on social media platforms to reach under-represented groups, especially young voters and national minority groups.
+* **Follow-up reminders:** An automated reminder email will be sent to participants who have not completed the survey to maximize response rates.
+* **Survey monitoring:** Response rates will be closely monitored throughout the data collection period and sampling methods will be adjusted if certain population quotas are not reached.
+* **Accessibility:** The survey will be mobile-friendly, which will allow respondents to complete the survey on any device.
+
+## Survey structure
+
+**Survey introduction:**
+
+Welcome! 
+
+We are conducting a survey to understand how demographic and educational factors influence hourly wages in Canada. Your participation is important, and your responses will contribute to valuable research on wage distribution across various groups.
+
+Please note:
+
+* All responses are confidential and will be used for research purposes only.
+* This survey will take approximately 10 minutes to complete.
+* Your participation is entirely voluntary, and you may withdraw at any time.
+* All questions marked with an asterisk are required.
+* There are no right or wrong answers, we appreciate your honest opinions.
+
+If you have any questions or concerns, please feel free to contact our research team at [liuyuanyi1208@gmail.com](mailto:liuyuanyi1208@gmail.com).
+
+As a thank-you for your participation, you will be entered into a raffle to win a gift card. We deeply appreciate the time and effort you contribute to this study.
+
+**Survey question:**
+
+**Part 1: Screening for eligibility**
+
+1.Are you currently employed?\
+* Yes / No\
+2.Are you aged 15 years or older?\
+* Yes / No\
+3.Do you currently reside in Canada?\
+* Yes / No
+
+**Part 2: Demographics**
+
+4.What is your age group?\
+* 15–24 years / 25–54 years / 55+\
+5.What is your gender?\
+* Male / Female / Non-binary / Prefer not to say\
+6.Which of the following best describes your race or ethnicity?
+* White / Black / Indigenous / Asian / Hispanic/Latino / Other\
+7.What is your highest level of education?\
+* 0–8 years / High school graduate / Trade certificate or diploma / Post-secondary certificate or diploma / Community college, CEGEP / University certificate below bachelor's degree / Bachelor's degree / University degree / Above bachelor's degree
+
+**Part 3: Employment details**
+
+8.Are you employed full-time or part-time?\
+* Full-time / Part-time\
+9.In which industry or job sector do you work?\
+* [Open-ended response]\
+10.How many hours do you typically work per week?\
+* [Numeric response]
+
+**Part 4: Wage**
+
+11.What is your average hourly income before taxes?\
+* [Numeric response]\
+12.Does your wage include additional benefits or bonuses?\
+* Yes / No\
+13.Do you believe your education level has impacted your wages?\
+* Yes / No / Not Sure
+
+**Part 5: Verify and Consent**
+
+14.Please select 'Agree' to verify that you are paying attention.\
+* Agree / Disagree\
+15.Do you agree to participate in this survey? Your responses will be kept confidential and used only for research purposes.\
+* Yes / No
+
+**End Part:**
+
+Thank you for your participation!
+
+Your responses are valuable to us in understanding wage trends in Canada. If you have any questions or would like more information about this research, please feel free to contact us at [liuyuanyi1208@gmail.com](mailto:liuyuanyi1208@gmail.com).
+
+
 # Data Manipulation and Cleaning {#sec-data-cleaning}
 
-During the data cleaning phase, the R packages `tidyverse` [@citetidyverse], `dplyr` [@citedplyr], and `arrow` [@citearrow] were utilized. The raw data was imported using `read_csv` from the `tidyverse` [@citetidyverse] package. Subsequent operations filtered the dataset to focus on Canadian data, both full-time and part-time. Additionally, the focus was placed on records that reported the average hourly wage rate, while entries with ambiguous educational levels such as "Some high school" and aggregate categories like "Total, all education levels" were excluded to maintain data clarity and relevance.
+During the data cleaning phase, the R packages `tidyverse` [@citetidyverse], `dplyr` [@citedplyr], and `arrow` [@citearrow] were used. The raw data was imported using `read_csv` from the `tidyverse` [@citetidyverse] package. Subsequent operations filtered the dataset to focus on Canadian data, both full-time and part-time. Additionally, the focus was placed on records that reported the average hourly wage rate, while entries with ambiguous educational levels such as "Some high school" and aggregate categories like "Total, all education levels" were excluded to maintain data clarity and relevance.
 
-The analysis was specifically targeted at the demographic group aged between 25 and 54 years, as this range represents a prime working-age population. Columns important to the analysis were chosen and renamed for better readability and straightforward reference in subsequent analytical procedures. This process included renaming the columns for the year and average hourly wage rate to 'Year' and 'Avg hourly wage rate' respectively.
+The analysis focused on data from 2000 onward, ensuring the timeframe was appropriate for the study. Age groups were restricted to "15–24 years," "25–54 years," and "55 years and over," representing distinct workforce demographics. Columns were renamed for clarity, including Year, Education_level, and Average_hourly_wages, enabling easier reference in subsequent analyses.
 
-Education levels were organized in a logical order ranging from "0 - 8 years" of education to "Above bachelor's degree" using the `factor` function to convert them into a categorical variable with a specified level order. This categorization was further enhanced by creating an accompanying numeric variable that mapped these ordered education levels to integers, thus facilitating quantitative analysis.
+To facilitate gender comparisons, the dataset was reshaped using the `pivot_longer` function, combining the Male and Female wage columns into a single column labeled Gender, with corresponding wage data stored under Average_hourly_wages. This restructuring allowed for straightforward comparisons across gender groups while maintaining a tidy dataset.
 
-The final step involved saving the cleaned and structured data. This was done using the `write_csv` function to generate a CSV file for broad compatibility and the `write_parquet` function from the `arrow` [@citearrow] package for a more compressed and efficient file format, both of which were stored in the `data/analysis_data` directory.
+Education levels were ordered logically, from "0–8 years" to "Above bachelor’s degree," using the `reorder` function. This ensured consistent interpretation in visualizations and modeling, highlighting wage trends across increasing educational attainment levels.
 
-In all figures and tables, the library `here` [@citehere] was used to ensure that the file path should be accessible in all directories.
+The final step involved saving the cleaned and structured data. This was done using the `write_csv` function to generate a CSV file for broad compatibility and the `write_parquet` function from the `arrow` [@citearrow] package for a more compressed and efficient file format, both of which were stored in the `data/02-analysis_data` directory. In all figures and tables, the library `here` [@citehere] was used to ensure that the file path should be accessible in all directories.
+
 
 # Model details {#sec-model-details}
 
 ## Posterior predictive check
 
+In @fig-ppcheck, we implement a posterior predictive check, which displays the overlap between the observed data (denoted by $y$) and the replicated data generated from the model (denoted by $y_{rep}$). In a well-fitting model, the distribution of these replicated data should resemble the distribution of the observed data. Here, the replicated lines mainly follow the shape and central tendency of the observed data’s density. This similarity indicates that the model is capturing the overall pattern of the data reasonably well. Deviations between the replicated and observed lines would indicate areas where the model might not be accurately capturing the data structure.
+
+```{r}
+#| eval: true
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-ppcheck
+#| fig-cap: "Comparison of Observed Data Density (dark line) and Model-Generated Replications (light lines) shows close alignment, suggesting the model captures the main distributional characteristics of the data."
+
+pp_check(model) +
+  theme_classic() +
+  theme(legend.position = "right")
+```
+
 ## Diagnostics
 
+```{r}
+#| echo: false
+#| eval: true
+#| message: false
+#| warning: false
+#| label: fig-rhat
+#| fig-cap: "All parameters have R-hat values at or below 1.05, indicating strong convergence of the MCMC chains and reliable parameter estimates."
+
+plot(model, "rhat")
+```
+
+@fig-rhat is a visualization of the Gelman-Rubin diagnostic, often denoted as R-hat, which assesses the convergence of a Bayesian model’s Markov Chain Monte Carlo (MCMC) samples. It shows the values of for various parameters in the model. An value close to 1 indicates good convergence, meaning the chains for each parameter have mixed well and are sampling from the same posterior distribution. In @fig-rhat, all parameters have an value at or below 1.05, suggesting that the model has achieved adequate convergence and the estimates are reliable.
 
 \newpage
 

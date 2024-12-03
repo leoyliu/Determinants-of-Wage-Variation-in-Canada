@@ -6,7 +6,7 @@
 # License: MIT
 # Pre-requisites: 
 #   - The `tidyverse`, `testthat` packages must be installed and loaded
-#   - 03-clean_data.R must have been run
+#   - 02-clean_data.R must have been run
 # Any other information needed? Make sure you are in the `Determinants-of-Wage-Variation-in-Canada` rproj
 
 
@@ -23,9 +23,9 @@ test_that("dataset has 1080 rows", {
   expect_equal(nrow(analysis_data), 1080)
 })
 
-# Test that the dataset has 6 columns
-test_that("dataset has 6 columns", {
-  expect_equal(ncol(analysis_data), 6)
+# Test that the dataset has 5 columns
+test_that("dataset has 5 columns", {
+  expect_equal(ncol(analysis_data), 5)
 })
 
 # Test that the 'Education_level' column is character type

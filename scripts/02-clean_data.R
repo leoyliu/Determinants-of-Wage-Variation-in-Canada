@@ -50,12 +50,6 @@ education_levels_ordered <- c("0 - 8  years", "High school graduate",
                               "Community college, CEGEP", "University certificate below bachelors degree", 
                               "University degree", "Bachelor's degree", "Above bachelor's degree")
 
-cleaned_data <- cleaned_data |>
-  mutate(
-    Education_level = factor(Education_level, levels = education_levels_ordered),
-    Education_numeric = as.numeric(Education_level)
-  )
-
 
 #### Save data ####
 write_csv(cleaned_data, "data/02-analysis_data/analysis_data.csv")
