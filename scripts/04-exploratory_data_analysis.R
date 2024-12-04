@@ -7,7 +7,7 @@
 # Pre-requisites: 
 #   - The `tidyverse`, `rstanarm` packages must be installed and loaded
 #   - 02-clean_data.R must have been run
-# Any other information needed? Make sure you are in the `Forecasting-the-2024-US-Presidential-Election` rproj
+# Any other information needed? Make sure you are in the `Determinants-of-Wage-Variation-in-Canada` rproj
 
 
 #### Workspace setup ####

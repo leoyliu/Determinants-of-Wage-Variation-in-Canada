@@ -154,7 +154,7 @@ cleaned_data %>%
   )
 ```
 
-@fig-education-level presents the distribution of average hourly wages in Canada from 2000 to 2019 across different education levels. Higher education levels, such as "University degree" and "Above bachelor's degree," are associated with higher median wages, while lower education levels, like "0–8 years," show significantly lower wages. The variability within each education level, shown by the spread of the boxes and whiskers, indicates differences in earning potential within these groups. For instance, individuals with an "Above bachelor's degree" earn higher wages on average and exhibit greater wage variability compared to those with "0–8 years" of education.
+@fig-education-level presents the distribution of average hourly wages in Canada from 2000 to 2019 across different education levels. Higher education levels, such as "University degree" and "Above bachelor's degree," are associated with higher median wages, while lower education levels, like "0–8 years," show lower wages. The variability within each education level, shown by the spread of the boxes and whiskers, indicates differences in earning potential within these groups. For instance, individuals with an "Above bachelor's degree" earn higher wages on average and exhibit greater wage variability compared to those with "0–8 years" of education.
 
 ### Gender
 
@@ -177,7 +177,7 @@ cleaned_data %>%
   theme_minimal()
 ```
 
-@fig-gender compares the distribution of average hourly wages in Canada from 2000 to 2019 by gender. It displays the spread of wages for each gender, with males generally earning higher wages as shown by the broader and higher distribution. The jittered points represent individual wage observations, further emphasizing the overlap and differences in wage ranges. While both distributions have a similar shape, the median wage for males is noticeably higher than that for females, reflecting a persistent gender wage gap over the period analyzed.
+@fig-gender compares the distribution of average hourly wages in Canada from 2000 to 2019 by gender. It displays the spread of wages for each gender, with males generally earning higher wages as shown by the broader and higher distribution. The jittered points represent individual wage observations, further emphasizing the overlap and differences in wage ranges. While both distributions have a similar shape, the median wage for males is higher than that for females, reflecting a persistent gender wage gap over the period analyzed.
 
 ### Age
 
@@ -346,7 +346,7 @@ cleaned_data |>
 
 @fig-visualize-model presents that wages consistently increase with higher levels of education across all age groups. This trend is evident in the steepness of the linear trendlines, showing that the wage benefits associated with university degrees and qualifications above a bachelor’s degree. The gender wage gap is visible in all panels, with males earning higher wages than females at nearly every education level. Notably, the gap widens at higher education levels, suggesting that gender disparities are more significant as qualifications increase.
 
-It also highlights differences in wages across age groups. Older individuals, particularly those aged 55 and over, earn higher wages compared to younger cohorts, reflecting the influence of experience and career progression. Additionally, the intersection of gender, age, and education reveals further disparities. For example, males with higher education levels in older age groups consistently exhibit the highest wages, while younger females with lower education levels earn the least.
+It also highlights differences in wages across age groups. Older individuals, particularly those aged 55 and over, earn higher wages compared to younger cohorts, reflecting the influence of experience and career progression. Additionally, the intersection of gender, age, and education shows further disparities. For example, males with higher education levels in older age groups consistently exhibit the highest wages, while younger females with lower education levels earn the least.
 
 
 # Discussion {#sec-discussion}
@@ -367,7 +367,7 @@ In practical terms, this trend reflects a lifecycle wage profile, where earnings
 
 ### Persistent Gender Wage Disparities
 
-The analysis reveals a consistent wage disparity between males and females, with males earning much more across all education levels and age groups. This persistent wage gap suggests systemic inequities in how labor markets reward work. Factors contributing to this disparity may include occupational segregation, differences in work hours, career interruptions, and implicit biases in hiring and promotion processes.
+The analysis presents a consistent wage disparity between males and females, with males earning much more across all education levels and age groups. This persistent wage gap suggests systemic inequities in how labor markets reward work. Factors contributing to this disparity may include occupational segregation, differences in work hours, career interruptions, and implicit biases in hiring and promotion processes.
 
 Addressing this gap requires targeted interventions. Initiatives such as wage transparency, mentorship programs for women, and policies promoting work-life balance could help bridge the divide. Beyond fairness, closing the gender wage gap has broader economic implications, as it could boost household incomes and enhance overall productivity in the economy.
 
