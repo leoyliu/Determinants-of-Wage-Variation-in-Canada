@@ -127,7 +127,7 @@ The `Education_level` variable represents individuals' highest level of formal e
 
 ```{r fig.width=5, fig.height=5}
 #| label: fig-education-level
-#| fig-cap: "Average hourly wages in Canada by education level from 2000 to 2019. Each box represents the wage distribution for a specific education level, with higher education levels corresponding to higher median wages."
+#| fig-cap: "Average hourly wages in Canada by education level from 2000 to 2019. Higher education levels corresponding to higher median wages."
 #| echo: false
 #| warning: false
 
@@ -162,7 +162,7 @@ The `Gender` variable indicates whether an individual identifies as "Male" or "F
 
 ```{r}
 #| label: fig-gender
-#| fig-cap: "Average hourly wages in Canada by gender from 2000 to 2019. Each violin plot represents the wage distribution for males and females, with males showing higher median wages and a broader range of earnings compared to females."
+#| fig-cap: "Average hourly wages in Canada by gender from 2000 to 2019. Males showing higher median wages and a broader range of earnings compared to females."
 #| echo: false
 #| warning: false
 
@@ -185,7 +185,7 @@ The `Age_group` variable divides individuals into three categories: "15-24 years
 
 ```{r}
 #| label: fig-age
-#| fig-cap: "Average hourly wages in Canada by age group from 2000 to 2019. Each curve represents the wage distribution for a specific age group, with older age groups showing higher average wages and broader distributions compared to younger groups."
+#| fig-cap: "Average hourly wages in Canada by age group from 2000 to 2019. Older age groups showing higher average wages and broader distributions compared to younger groups."
 #| echo: false
 #| warning: false
 
@@ -306,7 +306,7 @@ The relationship between education level, gender, and age group with average hou
 
 ```{r fig.width=10, fig.height=7}
 #| label: fig-visualize-model
-#| fig-cap: "Average hourly wages by education level, gender, and age group in Canada. Panels represent age groups, with points color-coded by gender. Dashed lines show linear trends, highlighting wage differences across education levels, genders, and age groups."
+#| fig-cap: "Average hourly wages by education level, gender, and age group in Canada. Wages increase with higher levels of education across all age groups."
 #| echo: false
 #| warning: false
 
@@ -461,7 +461,7 @@ The survey will be available via Google Forms to ensure broad accessibility and 
 
 Welcome! 
 
-We are conducting a survey to understand how demographic and educational factors influence hourly wages in Canada. Your participation is important, and your responses will contribute to valuable research on wage distribution across various groups.
+We are conducting a survey to understand how demographic and educational factors influence hourly wages in Canada. Your participation is important, and your responses will contribute to the research on wage distribution across various groups.
 
 Please note:
 
@@ -526,7 +526,7 @@ As a thank-you for your participation, you will be entered into a raffle to win 
 
 Thank you for your participation!
 
-Your responses are valuable to us in understanding wage trends in Canada. If you have any questions or would like more information about this research, please feel free to contact us at [liuyuanyi1208@gmail.com](mailto:liuyuanyi1208@gmail.com).
+Your responses are important to us in understanding wage trends in Canada. If you have any questions or would like more information about this research, please feel free to contact us at [liuyuanyi1208@gmail.com](mailto:liuyuanyi1208@gmail.com).
 
 
 # Data Manipulation and Cleaning {#sec-data-cleaning}
